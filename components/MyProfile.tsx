@@ -48,11 +48,7 @@ export default function MyProfile() {
   return (
     <div className="bg-gray-900 text-white max-w-2xl mx-auto p-6 space-y-6">
       <div className="flex items-center gap-4">
-        <img
-          src={profile.avatar_url || "https://placehold.co/100"}
-          alt="Profile"
-          className="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
-        />
+
         <div>
           <h2 className="text-2xl font-bold">{profile.display_name || "No name set"}</h2>
           <p className="text-gray-400">{profile.role_title || "No role set"}</p>

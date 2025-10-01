@@ -19,7 +19,7 @@ export default function AuthPage() {
 
     if (isRegister) {
       // Sign up
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
       });
@@ -30,7 +30,7 @@ export default function AuthPage() {
       }
     } else {
       // Sign in
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
