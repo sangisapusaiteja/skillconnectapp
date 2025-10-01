@@ -48,49 +48,53 @@ export default function MyProfile() {
     fetchProfile();
   }, []);
 
-  if (!profile) return <p className="text-white">Loading profile...</p>;
+  if (!profile) return <p className="text-gray-300 text-center mt-10">Loading profile...</p>;
 
   return (
-    <div className="bg-gray-900 text-white max-w-2xl mx-auto p-6 space-y-6 rounded-lg shadow">
-      <div className="flex items-center gap-4">
+    <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white max-w-5xl mx-auto p-6 md:p-10 space-y-8 rounded-2xl shadow-2xl">
+      {/* Top Section */}
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
         {/* Avatar */}
-        <Avatar className="h-20 w-20">
+        <Avatar className="h-28 w-28 border-4 border-gray-700 shadow-lg">
           <AvatarImage src={profile.avatar_url || ""} alt={profile.display_name || "User"} />
-          <AvatarFallback>
+          <AvatarFallback className="text-xl">
             {profile.display_name?.[0]?.toUpperCase() || "U"}
           </AvatarFallback>
         </Avatar>
 
         {/* Basic Info */}
-        <div>
-          <h2 className="text-2xl font-bold">
+        <div className="text-center sm:text-left space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">
             {profile.display_name || "No name set"}
           </h2>
-          <p className="text-gray-400">{profile.role_title || "No role set"}</p>
-          <p className="text-gray-500 text-sm">
-            {profile.location || "Location not set"}
-          </p>
-          <div className="mt-1">{profile.availability || "Unavailable"}</div>
+          <p className="text-lg text-gray-300">{profile.role_title || "No role set"}</p>
+          <p className="text-gray-400 text-sm">{profile.location || "Location not set"}</p>
+          <span
+            className="inline-block mt-2 px-3 py-1 rounded-full text-xs font-medium
+              bg-gray-700 text-gray-200 shadow-sm"
+          >
+            {profile.availability || "Unavailable"}
+          </span>
         </div>
       </div>
 
       {/* Bio */}
       {profile.bio && (
-        <div>
-          <h3 className="font-semibold text-lg">Bio</h3>
-          <p className="text-gray-300">{profile.bio}</p>
+        <div className="bg-gray-800/50 p-5 rounded-xl shadow">
+          <h3 className="font-semibold text-lg mb-2">Bio</h3>
+          <p className="text-gray-300 leading-relaxed">{profile.bio}</p>
         </div>
       )}
 
       {/* Skills */}
       {profile.skills && profile.skills.length > 0 && (
         <div>
-          <h3 className="font-semibold text-lg">Skills</h3>
-          <div className="flex flex-wrap gap-2 mt-1">
+          <h3 className="font-semibold text-lg mb-3">Skills</h3>
+          <div className="flex flex-wrap gap-2">
             {profile.skills.map((skill) => (
               <span
                 key={skill}
-                className="px-3 py-1 bg-gray-800 rounded-md text-sm text-gray-200"
+                className="px-4 py-1 bg-gray-700 rounded-full text-sm text-gray-200 shadow-sm hover:bg-gray-600 transition"
               >
                 {skill}
               </span>
@@ -100,69 +104,49 @@ export default function MyProfile() {
       )}
 
       {/* Links */}
-      <div className="flex gap-4 flex-wrap text-sm text-gray-400">
+      <div className="flex gap-6 flex-wrap text-sm text-gray-300">
         {profile.website_url && (
-          <a
-            href={profile.website_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline"
-          >
-            Website
+          <a href={profile.website_url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+            🌐 Website
           </a>
         )}
         {profile.github_url && (
-          <a
-            href={profile.github_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline"
-          >
-            GitHub
+          <a href={profile.github_url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+            💻 GitHub
           </a>
         )}
         {profile.linkedin_url && (
-          <a
-            href={profile.linkedin_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline"
-          >
-            LinkedIn
+          <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+            🔗 LinkedIn
           </a>
         )}
         {profile.dribbble_url && (
-          <a
-            href={profile.dribbble_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline"
-          >
-            Dribbble
+          <a href={profile.dribbble_url} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+            🎨 Dribbble
           </a>
         )}
       </div>
 
       {/* Stats */}
-      <div className="flex gap-6 text-gray-300 mt-4">
-        <div>
-          <p className="font-semibold">{profile.followers_count}</p>
-          <p className="text-sm">Followers</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 text-center sm:text-left">
+        <div className="bg-gray-800/50 p-4 rounded-lg shadow">
+          <p className="text-xl font-semibold">{profile.followers_count}</p>
+          <p className="text-gray-400 text-sm">Followers</p>
         </div>
-        <div>
-          <p className="font-semibold">{profile.following_count}</p>
-          <p className="text-sm">Following</p>
+        <div className="bg-gray-800/50 p-4 rounded-lg shadow">
+          <p className="text-xl font-semibold">{profile.following_count}</p>
+          <p className="text-gray-400 text-sm">Following</p>
         </div>
         {profile.experience_level && (
-          <div>
-            <p className="font-semibold">{profile.experience_level}</p>
-            <p className="text-sm">Experience</p>
+          <div className="bg-gray-800/50 p-4 rounded-lg shadow">
+            <p className="text-xl font-semibold">{profile.experience_level}</p>
+            <p className="text-gray-400 text-sm">Experience</p>
           </div>
         )}
       </div>
 
       {/* Updated */}
-      <p className="text-gray-500 text-xs">
+      <p className="text-gray-500 text-xs text-center sm:text-right">
         Last updated:{" "}
         {profile.updated_at
           ? new Date(profile.updated_at).toLocaleString()
