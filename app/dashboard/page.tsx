@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import * as Tabs from "@radix-ui/react-tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 import MyProfile from "@/components/MyProfile";
 import AllUsers from "@/components/AllUsers";
@@ -28,29 +28,29 @@ export default function Dashboard() {
     <div className="min-h-screen bg-black text-white p-8">
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-      <Tabs.Root defaultValue="profile">
-        <Tabs.List className="flex border-b border-gray-700 mb-4">
-          <Tabs.Trigger
+      <Tabs defaultValue="profile" className="w-full">
+        <TabsList className="grid w-[300px] grid-cols-2 bg-gray-800 rounded-lg">
+          <TabsTrigger
             value="profile"
-            className="px-4 py-2 border-b-2 border-transparent data-[state=active]:border-blue-500"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
             My Profile
-          </Tabs.Trigger>
-          <Tabs.Trigger
+          </TabsTrigger>
+          <TabsTrigger
             value="people"
-            className="px-4 py-2 border-b-2 border-transparent data-[state=active]:border-blue-500"
+            className="data-[state=active]:bg-blue-600 data-[state=active]:text-white"
           >
             People
-          </Tabs.Trigger>
-        </Tabs.List>
+          </TabsTrigger>
+        </TabsList>
 
-        <Tabs.Content value="profile">
+        <TabsContent value="profile" className="mt-6">
           <MyProfile />
-        </Tabs.Content>
-        <Tabs.Content value="people">
+        </TabsContent>
+        <TabsContent value="people" className="mt-6">
           <AllUsers />
-        </Tabs.Content>
-      </Tabs.Root>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

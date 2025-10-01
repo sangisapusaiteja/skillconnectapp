@@ -3,6 +3,15 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
@@ -43,44 +52,51 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-4">
-      <h1 className="text-3xl mb-6">{isRegister ? "Register" : "Login"}</h1>
-
-      <div className="flex flex-col gap-4 w-full max-w-sm">
-        <input
-          type="email"
-          placeholder="Email"
-          className="p-3 rounded bg-gray-800 text-white"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="p-3 rounded bg-gray-800 text-white"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {error && <p className="text-red-500">{error}</p>}
-
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded"
-          onClick={handleAuth}
-          disabled={loading}
-        >
-          {loading ? "Processing..." : isRegister ? "Register" : "Login"}
-        </button>
-
-        <p className="text-gray-400 text-sm mt-2">
-          {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
-          <button
-            className="text-blue-500 underline"
-            onClick={() => setIsRegister(!isRegister)}
+    <div className="min-h-screen flex items-center justify-center bg-black p-4">
+      <Card className="w-full max-w-sm bg-gray-900 text-white border-gray-700">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">
+            {isRegister ? "Register" : "Login"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            className="bg-gray-800 text-white"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            className="bg-gray-800 text-white"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+        </CardContent>
+        <CardFooter className="flex flex-col gap-2">
+          <Button
+            onClick={handleAuth}
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700"
           >
-            {isRegister ? "Login" : "Register"}
-          </button>
-        </p>
-      </div>
+            {loading ? "Processing..." : isRegister ? "Register" : "Login"}
+          </Button>
+          <p className="text-gray-400 text-sm text-center">
+            {isRegister
+              ? "Already have an account?"
+              : "Don't have an account?"}{" "}
+            <button
+              className="text-blue-500 underline"
+              onClick={() => setIsRegister(!isRegister)}
+            >
+              {isRegister ? "Login" : "Register"}
+            </button>
+          </p>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

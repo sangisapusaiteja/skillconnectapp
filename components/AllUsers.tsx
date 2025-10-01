@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Image from "next/image";
 
 interface UserProfile {
   id: string;
@@ -12,8 +13,6 @@ interface UserProfile {
 export default function AllUsers() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-
-  console.log(currentUserId, "currentUserId");
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -40,6 +39,16 @@ export default function AllUsers() {
           key={u.id}
           className="flex items-center gap-4 border p-3 rounded-lg"
         >
+          {/* Avatar */}
+          <Image
+            src={u.avatar_url || "/default-avatar.png"} // fallback image
+            alt={u.display_name || "User avatar"}
+            width={40}
+            height={40}
+            className="rounded-full border"
+          />
+
+          {/* Name */}
           <span>{u.display_name || "Unnamed user"}</span>
         </div>
       ))}
