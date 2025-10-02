@@ -118,6 +118,12 @@ export default function AllUsers() {
                   >
                     View Profile
                   </button>
+                  <button
+                    className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-full text-sm font-medium transition"
+                    onClick={() => router.push(`/messages/${u.id},${currentUserId}`)}
+                  >
+                    Message
+                  </button>
                 </div>
               </div>
             </div>
