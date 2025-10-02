@@ -2,14 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
-interface UserProfile {
+export interface UserProfile {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
@@ -60,7 +60,12 @@ export default function MyProfile() {
 
   if (!profile || !formData)
     return (
-      <p className="text-gray-300 text-center mt-10">Loading profile...</p>
+      <div className="flex items-center justify-center h-[calc(100vh-140px)]">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-300 mt-4">Loading profile...</p>
+        </div>
+      </div>
     );
 
   // Handle input changes
@@ -103,7 +108,7 @@ export default function MyProfile() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white max-w-5xl mx-auto p-6 md:p-10 space-y-8 rounded-2xl shadow-2xl">
+    <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white max-w-5xl mx-auto p-6  space-y-6 rounded-2xl shadow-2xl">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -118,15 +123,19 @@ export default function MyProfile() {
       />
       {/* Top Section */}
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-        <Avatar className="h-28 w-28 border-4 border-gray-700 shadow-lg cursor-pointer">
-          <AvatarImage
-            src={formData.avatar_url || ""}
+        <div className="relative h-60 w-80 rounded-full border-4 border-gray-700 shadow-lg overflow-hidden cursor-pointer">
+          <Image
+            src={formData.avatar_url || "/default-avatar.png"}
             alt={formData.display_name || "User"}
+            fill
+            className="object-cover"
           />
-          <AvatarFallback className="text-xl">
-            {formData.display_name?.[0]?.toUpperCase() || "U"}
-          </AvatarFallback>
-        </Avatar>
+          {!formData.avatar_url && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-xl font-bold text-white">
+              {formData.display_name?.[0]?.toUpperCase() || "U"}
+            </div>
+          )}
+        </div>
 
         <div className="text-center sm:text-left space-y-2 w-full">
           {editMode ? (
