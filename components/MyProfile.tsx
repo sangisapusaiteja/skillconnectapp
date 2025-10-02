@@ -64,7 +64,10 @@ export default function MyProfile() {
     );
 
   // Handle input changes
-  const handleChange = (field: keyof UserProfile, value: any) => {
+  const handleChange = <K extends keyof UserProfile>(
+    field: K,
+    value: UserProfile[K]
+  ) => {
     setFormData((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
@@ -140,10 +143,13 @@ export default function MyProfile() {
                 disabled
               />
               <Input
-                value={formData.phone_number || ""}
-                onChange={(e) => handleChange("phone_number", e.target.value)}
+                value={formData.phone_number?.toString() || ""}
+                onChange={(e) =>
+                  handleChange("phone_number", Number(e.target.value))
+                }
                 placeholder="Phone Number"
               />
+
               <Input
                 value={formData.role_title || ""}
                 onChange={(e) => handleChange("role_title", e.target.value)}
@@ -157,7 +163,16 @@ export default function MyProfile() {
               <select
                 className="bg-gray-800 p-2 rounded w-full"
                 value={formData.availability || ""}
-                onChange={(e) => handleChange("availability", e.target.value)}
+                onChange={(e) =>
+                  handleChange(
+                    "availability",
+                    e.target.value as
+                      | "Open"
+                      | "Busy"
+                      | "Looking for Collaboration"
+                      | null
+                  )
+                }
               >
                 <option value="">Select Availability</option>
                 <option value="Open">Open</option>
@@ -213,7 +228,7 @@ export default function MyProfile() {
             onChange={(e) =>
               handleChange(
                 "skills",
-                e.target.value.split(",").map((s) => s.trim())
+                e.target.value.split(",").map((s) => s.trim()) // TypeScript now accepts this
               )
             }
             placeholder="Enter skills separated by commas"
@@ -283,7 +298,16 @@ export default function MyProfile() {
             <select
               className="bg-gray-800 border border-gray-700 p-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none h-full"
               value={formData.experience_level || ""}
-              onChange={(e) => handleChange("experience_level", e.target.value)}
+              onChange={(e) =>
+                handleChange(
+                  "experience_level",
+                  e.target.value as
+                    | "Beginner"
+                    | "Intermediate"
+                    | "Expert"
+                    | null
+                )
+              }
             >
               <option value="">Select Experience</option>
               <option value="Beginner">Beginner</option>
