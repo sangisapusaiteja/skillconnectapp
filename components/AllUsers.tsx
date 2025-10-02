@@ -79,14 +79,21 @@ export default function AllUsers() {
           <SwiperSlide key={u.id}>
             <div className="relative bg-gray-900 w-full h-full flex flex-col justify-end rounded-lg">
               {/* User Image */}
-              <div className="absolute top-0 left-0 w-full h-full rounded-lg">
-                <Image
-                  src={u.avatar_url || "/default-avatar.png"}
-                  alt={u.display_name || "User avatar"}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
+              <div className="absolute top-0 left-0 w-full h-full rounded-lg overflow-hidden">
+                {u.avatar_url ? (
+                  <Image
+                    src={u.avatar_url}
+                    alt={u.display_name || "User avatar"}
+                    fill
+                    className="object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-9xl font-bold text-white">
+                    {u.display_name?.[0]?.toUpperCase() || "U"}
+                  </div>
+                )}
+
                 <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-gray-900/90 to-transparent rounded-lg" />
               </div>
 

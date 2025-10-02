@@ -74,17 +74,23 @@ export default function Dashboard() {
         {user && !viewProfile && (
           <button
             onClick={() => setViewProfile(true)}
-            className="rounded-full border-2 border-gray-700 overflow-hidden w-12 h-12 transform transition duration-300 hover:scale-110"
+            className="relative rounded-full border-2 border-gray-700 overflow-hidden w-12 h-12 transform transition duration-300 hover:scale-110"
           >
-            <Image
-              src={user.avatar_url || "/default-avatar.png"}
-              alt={user.display_name || "User"}
-              width={48}
-              height={48}
-              className="object-cover w-full h-full"
-            />
+            {user.avatar_url ? (
+              <Image
+                src={user.avatar_url}
+                alt={user.display_name || "User"}
+                width={48}
+                height={48}
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-800 text-3xl font-bold text-white">
+                {user.display_name?.[0]?.toUpperCase() || "U"}
+              </div>
+            )}
           </button>
-        )}
+        )}  
 
         {viewProfile && (
           <button

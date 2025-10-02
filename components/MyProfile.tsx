@@ -34,6 +34,7 @@ export default function MyProfile() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState<UserProfile | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   // Fetch profile
   useEffect(() => {
@@ -107,8 +108,46 @@ export default function MyProfile() {
     }
   };
 
+  // Avatar upload handler
+  const handleAvatarUpload = async (file: File) => {
+    setUploading(true);
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = fileName;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, { upsert: true });
+
+      if (error) {
+        console.error("Upload error:", error);
+        toast.error("Failed to upload avatar.");
+        setUploading(false);
+        return;
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(filePath);
+
+      // Update formData safely
+      setFormData((prev) =>
+        prev ? { ...prev, avatar_url: urlData.publicUrl } : prev
+      );
+
+      toast.success("Avatar uploaded successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong during upload.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   return (
-    <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white max-w-5xl mx-auto p-6  space-y-6 rounded-2xl shadow-2xl">
+    <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white max-w-5xl mx-auto p-6 space-y-6 rounded-2xl shadow-2xl">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -121,20 +160,48 @@ export default function MyProfile() {
         pauseOnHover
         transition={Bounce}
       />
+
       {/* Top Section */}
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-        <div className="relative h-60 w-80 rounded-full border-4 border-gray-700 shadow-lg overflow-hidden cursor-pointer">
-          <Image
-            src={formData.avatar_url || "/default-avatar.png"}
-            alt={formData.display_name || "User"}
-            fill
-            className="object-cover"
-          />
-          {!formData.avatar_url && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-xl font-bold text-white">
-              {formData.display_name?.[0]?.toUpperCase() || "U"}
-            </div>
-          )}
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full border-4 border-gray-700 shadow-lg overflow-hidden cursor-pointer group">
+            <Image
+              src={formData?.avatar_url || "/default-avatar.png"}
+              alt={formData?.display_name || "User"}
+              fill
+              className="object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
+            />
+
+            {/* If no avatar, show first letter */}
+            {!formData?.avatar_url && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-6xl sm:text-8xl font-bold text-white">
+                {formData?.display_name?.[0]?.toUpperCase() || "U"}
+              </div>
+            )}
+
+            {/* Overlay upload button in edit mode */}
+            {editMode && (
+              <label className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded-full cursor-pointer text-white font-semibold">
+                <span className="mb-1">Change Avatar</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleAvatarUpload(file);
+                  }}
+                />
+              </label>
+            )}
+
+            {/* Loader overlay */}
+            {uploading && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
+                <div className="w-10 h-10 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="text-center sm:text-left space-y-2 w-full">
@@ -158,7 +225,6 @@ export default function MyProfile() {
                 }
                 placeholder="Phone Number"
               />
-
               <Input
                 value={formData.role_title || ""}
                 onChange={(e) => handleChange("role_title", e.target.value)}
@@ -237,7 +303,7 @@ export default function MyProfile() {
             onChange={(e) =>
               handleChange(
                 "skills",
-                e.target.value.split(",").map((s) => s.trim()) // TypeScript now accepts this
+                e.target.value.split(",").map((s) => s.trim())
               )
             }
             placeholder="Enter skills separated by commas"

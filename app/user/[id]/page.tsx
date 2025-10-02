@@ -102,7 +102,7 @@ export default function ViewUserProfile() {
                 className="object-cover"
               />
               {!profile.avatar_url && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-xl font-bold text-white">
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-800 text-9xl font-bold text-white">
                   {profile.display_name?.[0]?.toUpperCase() || "U"}
                 </div>
               )}
