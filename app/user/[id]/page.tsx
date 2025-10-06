@@ -67,30 +67,9 @@ export default function ViewUserProfile() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
-      {/* Header */}
-      <header className="px-6 md:px-12 py-4 border-b border-gray-800 sticky top-0 z-50 bg-black/80 backdrop-blur-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex flex-col w-full">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            SkillConnect
-          </h1>
-          <p className="text-gray-300 text-sm sm:text-base max-w-full mt-1 whitespace-nowrap overflow-x-auto">
-            Welcome back,{" "}
-            <span className="text-blue-400 font-medium">
-              Exchange Skills, Not Money
-            </span>{" "}
-            — Discover people to learn and collaborate with.
-          </p>
-        </div>
-        <button
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-full font-medium transition"
-          onClick={() => router.back()}
-        >
-          Back
-        </button>
-      </header>
+    <div className="flex  items-center justify-center bg-gradient-to-b from-black via-gray-900 to-black text-white h-[calc(100vh-110px)] ">
       {/* Main content */}
-      <main className="px-6 md:px-12 py-4 max-w-6xl mx-auto">
+      <main className="px-6 md:px-12 py-4 min-w-6xl mx-auto">
         <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white max-w-5xl mx-auto p-6  space-y-6 rounded-2xl shadow-2xl">
           {/* Top Section */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">

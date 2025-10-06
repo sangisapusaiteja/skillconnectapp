@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 import MyProfile from "@/components/MyProfile";
 import AllUsers from "@/components/AllUsers";
 import { supabase } from "@/lib/supabaseClient";
+import { useUserContext } from "@/context/UserContext"; // ✅ Global context to track profile view
 
 export interface UserProfile {
   id: string;
@@ -16,108 +16,44 @@ export interface UserProfile {
 
 export default function Dashboard() {
   const router = useRouter();
+  const { profileClicked } = useUserContext(); // ✅ Global state: is profile being viewed?
   const [loading, setLoading] = useState(true);
-  const [viewProfile, setViewProfile] = useState(false);
-  const [user, setUser] = useState<UserProfile | null>(null);
 
+  // Fetch session and check authentication
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserSession = async () => {
       const { data: sessionData } = await supabase.auth.getSession();
+
+      // If user is not logged in, redirect to login page
       if (!sessionData.session) {
-        router.push("/"); // redirect if not logged in
+        router.push("/");
         return;
       }
 
-      const { data: userData } = await supabase.auth.getUser();
-      if (userData?.user) {
-        const { data: profileData, error } = await supabase
-          .from("users")
-          .select("id, display_name, avatar_url")
-          .eq("id", userData.user.id)
-          .single();
-        if (!error) setUser(profileData);
-      }
-
-      setLoading(false);
+      setLoading(false); // Session valid, stop loading
     };
 
-    fetchUser();
+    fetchUserSession();
   }, [router]);
 
-  if (loading)
+  // Show a loading spinner while checking session
+  if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
+      <div className="flex items-center justify-center h-[calc(100vh-140px)]">
         <div className="flex flex-col items-center">
           <div className="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
           <p className="text-gray-300 mt-4 text-center text-lg">Loading...</p>
         </div>
       </div>
     );
+  }
 
+  // Main dashboard content
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white">
-      {/* Header */}
-      <header className="px-6 md:px-12 py-4 border-b border-gray-800 sticky top-0 z-50 bg-black/80 backdrop-blur-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="flex flex-col w-full">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            SkillConnect
-          </h1>
-          <p className="text-gray-300 text-sm sm:text-base max-w-full mt-1 whitespace-nowrap overflow-x-auto">
-            Welcome back,{" "}
-            <span className="text-blue-400 font-medium">
-              Exchange Skills, Not Money
-            </span>{" "}
-            — Discover people to learn and collaborate with.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {user && !viewProfile && (
-            <button
-              onClick={() => setViewProfile(true)}
-              className="relative rounded-full border-2 border-gray-700 overflow-hidden w-12 h-12 transform transition duration-300 hover:scale-110"
-            >
-              {user.avatar_url ? (
-                <Image
-                  src={user.avatar_url}
-                  alt={user.display_name || "User"}
-                  width={48}
-                  height={48}
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-800 text-3xl font-bold text-white">
-                  {user.display_name?.[0]?.toUpperCase() || "U"}
-                </div>
-              )}
-            </button>
-          )}
-
-          {viewProfile && (
-            <button
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-full font-medium transition"
-              onClick={() => setViewProfile(false)}
-            >
-              Back
-            </button>
-          )}
-
-          {/* 🔹 Logout Button */}
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              router.push("/");
-            }}
-            className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-full font-medium transition"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
-
-      {/* Main content */}
+    <div className="bg-gradient-to-b from-black via-gray-900 to-black text-white">
       <main className="px-6 md:px-12 py-4 max-w-6xl mx-auto">
-        {viewProfile ? <MyProfile /> : <AllUsers />}
+        {/* Conditionally render MyProfile or AllUsers based on global state */}
+        {profileClicked ? <MyProfile /> : <AllUsers />}
       </main>
     </div>
   );
