@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { UserProfile } from "@/app/dashboard/page";
 
 export interface User {
   id: string;
@@ -55,6 +56,10 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  const ids = decodeURIComponent(params.userId as string).split(",");
+  const firstId = ids[0];
 
   // Determine users based on URL and fetch latest chat if only one ID
   useEffect(() => {
@@ -67,14 +72,37 @@ export default function ChatPage() {
       const ids = decodeURIComponent(params.userId as string).split(",");
 
       if (ids.length === 2) {
-        // URL has both toUserId and fromUserId
-        setToUserId(ids[0]);
-        setFromUserId(ids[1]);
+        setFromUserId(ids[0]);
+        setToUserId(ids[1]);
       }
     };
 
     initUsers();
   }, [params.userId, router]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        router.push("/"); // redirect if not logged in
+        return;
+      }
+
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData?.user) {
+        const { data: profileData, error } = await supabase
+          .from("users")
+          .select("id, display_name, avatar_url")
+          .eq("id", userData.user.id)
+          .single();
+        if (!error) setUser(profileData);
+      }
+
+      setLoading(false);
+    };
+
+    fetchUser();
+  }, [router]);
 
   // Fetch chat list
   useEffect(() => {
@@ -254,12 +282,27 @@ export default function ChatPage() {
               — Discover people to learn and collaborate with.
             </p>
           </div>
-          <button
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-full font-medium transition"
-            onClick={() => router.back()}
-          >
-            Back
-          </button>
+
+          <div className="flex items-center gap-3">
+            {/* Back Button */}
+            <button
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-full font-medium transition"
+              onClick={() => router.back()}
+            >
+              Back
+            </button>
+
+            {/* Logout Button */}
+            <button
+              className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-full font-medium transition"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                router.push("/");
+              }}
+            >
+              Logout
+            </button>
+          </div>
         </header>
 
         <div className="flex flex-1 overflow-hidden justify-between">
@@ -276,7 +319,7 @@ export default function ChatPage() {
                     params.userId?.includes(chat.user.id) ? "bg-gray-800" : ""
                   }`}
                   onClick={() =>
-                    router.replace(`/messages/${chat.user.id},${fromUserId}`, {
+                    router.replace(`/messages/${firstId},${chat.user.id}`, {
                       scroll: false,
                     })
                   }

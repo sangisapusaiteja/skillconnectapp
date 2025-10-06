@@ -116,7 +116,7 @@ export default function AllUsers() {
                     className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-full text-sm font-medium transition"
                     onClick={() =>
                       currentUserId &&
-                      router.push(`/messages/${u.id},${currentUserId}`)
+                      router.push(`/messages/${currentUserId},${u.id}`)
                     }
                   >
                     Message

@@ -8,7 +8,7 @@ import MyProfile from "@/components/MyProfile";
 import AllUsers from "@/components/AllUsers";
 import { supabase } from "@/lib/supabaseClient";
 
-interface UserProfile {
+export interface UserProfile {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
@@ -71,35 +71,48 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {user && !viewProfile && (
-          <button
-            onClick={() => setViewProfile(true)}
-            className="relative rounded-full border-2 border-gray-700 overflow-hidden w-12 h-12 transform transition duration-300 hover:scale-110"
-          >
-            {user.avatar_url ? (
-              <Image
-                src={user.avatar_url}
-                alt={user.display_name || "User"}
-                width={48}
-                height={48}
-                className="object-cover w-full h-full"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-800 text-3xl font-bold text-white">
-                {user.display_name?.[0]?.toUpperCase() || "U"}
-              </div>
-            )}
-          </button>
-        )}  
+        <div className="flex items-center gap-4">
+          {user && !viewProfile && (
+            <button
+              onClick={() => setViewProfile(true)}
+              className="relative rounded-full border-2 border-gray-700 overflow-hidden w-12 h-12 transform transition duration-300 hover:scale-110"
+            >
+              {user.avatar_url ? (
+                <Image
+                  src={user.avatar_url}
+                  alt={user.display_name || "User"}
+                  width={48}
+                  height={48}
+                  className="object-cover w-full h-full"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-800 text-3xl font-bold text-white">
+                  {user.display_name?.[0]?.toUpperCase() || "U"}
+                </div>
+              )}
+            </button>
+          )}
 
-        {viewProfile && (
+          {viewProfile && (
+            <button
+              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-full font-medium transition"
+              onClick={() => setViewProfile(false)}
+            >
+              Back
+            </button>
+          )}
+
+          {/* 🔹 Logout Button */}
           <button
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-full font-medium transition"
-            onClick={() => setViewProfile(false)}
+            onClick={async () => {
+              await supabase.auth.signOut();
+              router.push("/");
+            }}
+            className="px-4 py-2 bg-red-600 hover:bg-red-500 rounded-full font-medium transition"
           >
-            Back
+            Logout
           </button>
-        )}
+        </div>
       </header>
 
       {/* Main content */}
