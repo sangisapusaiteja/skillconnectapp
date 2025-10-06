@@ -262,7 +262,7 @@ export default function ChatPage() {
           </button>
         </header>
 
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden justify-between">
           {/* Sidebar */}
           <aside className="w-100 border-r border-gray-800 bg-gray-900 flex flex-col">
             <h2 className="px-4 py-3 font-bold text-lg border-b border-gray-800">
