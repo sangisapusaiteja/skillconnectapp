@@ -20,7 +20,7 @@ interface UserProfile {
 export default function AllUsers() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true); // ✅ new loading state
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -35,12 +35,11 @@ export default function AllUsers() {
         setUsers(data.filter((u) => u.id !== user?.id));
       }
 
-      setLoading(false); // ✅ stop loading once data comes
+      setLoading(false);
     };
     fetchUsers();
   }, []);
 
-  // ✅ Show loader while fetching
   if (loading)
     return (
       <div className="flex items-center justify-center h-[calc(100vh-140px)]">
@@ -51,7 +50,6 @@ export default function AllUsers() {
       </div>
     );
 
-  // ✅ Only show "No users found" AFTER loading finished
   if (!users.length)
     return (
       <div className="flex flex-col items-center justify-center h-[calc(100vh-140px)] text-gray-400">
@@ -63,9 +61,8 @@ export default function AllUsers() {
       </div>
     );
 
-  // ✅ Show Swiper if data exists
   return (
-    <div className="h-[calc(100vh-140px)] w-full rounded-lg overflow-hidden">
+    <div className="h-[calc(100vh-140px)] w-full rounded-lg overflow-hidden relative">
       <Swiper
         direction="vertical"
         slidesPerView={1}
@@ -78,7 +75,6 @@ export default function AllUsers() {
         {users.map((u) => (
           <SwiperSlide key={u.id}>
             <div className="relative bg-gray-900 w-full h-full flex flex-col justify-end rounded-lg">
-              {/* User Image */}
               <div className="absolute top-0 left-0 w-full h-full rounded-lg overflow-hidden">
                 {u.avatar_url ? (
                   <Image
@@ -93,11 +89,9 @@ export default function AllUsers() {
                     {u.display_name?.[0]?.toUpperCase() || "U"}
                   </div>
                 )}
-
                 <div className="absolute bottom-0 w-full h-1/3 bg-gradient-to-t from-gray-900/90 to-transparent rounded-lg" />
               </div>
 
-              {/* User Info & Actions */}
               <div className="relative z-10 p-6 flex flex-col items-center gap-2 text-center">
                 <h3 className="text-white text-3xl font-bold">
                   {u.display_name || "Unnamed"}
@@ -120,7 +114,10 @@ export default function AllUsers() {
                   </button>
                   <button
                     className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-full text-sm font-medium transition"
-                    onClick={() => router.push(`/messages/${u.id},${currentUserId}`)}
+                    onClick={() =>
+                      currentUserId &&
+                      router.push(`/messages/${u.id},${currentUserId}`)
+                    }
                   >
                     Message
                   </button>
@@ -130,6 +127,16 @@ export default function AllUsers() {
           </SwiperSlide>
         ))}
       </Swiper>
+
+      {/* Floating chat button */}
+      {currentUserId && (
+        <button
+          className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 hover:bg-blue-700 rounded-full shadow-lg flex items-center justify-center text-white text-2xl transition"
+          onClick={() => router.push(`/messages/${currentUserId}`)}
+        >
+          💬
+        </button>
+      )}
     </div>
   );
 }
