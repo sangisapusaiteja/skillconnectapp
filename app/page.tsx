@@ -48,7 +48,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black p-6">
+    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black p-6">
       {/* Tagline / Hero */}
       <div className="text-center mb-8 max-full">
         <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-2">

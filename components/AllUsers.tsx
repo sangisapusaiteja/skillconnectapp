@@ -103,9 +103,9 @@ export default function AllUsers() {
                   <p className="text-gray-400 text-xs">{u.location}</p>
                 )}
                 <div className="mt-4 flex gap-3">
-                  <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-full text-sm font-medium transition">
+                  {/* <button className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-full text-sm font-medium transition">
                     Connect
-                  </button>
+                  </button> */}
                   <button
                     className="px-6 py-2 bg-gray-700 hover:bg-gray-800 rounded-full text-sm font-medium transition"
                     onClick={() => router.push(`/user/${u.id}`)}

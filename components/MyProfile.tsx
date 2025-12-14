@@ -219,12 +219,15 @@ export default function MyProfile() {
                 disabled
               />
               <Input
-                value={formData.phone_number?.toString() || ""}
+                type="text"
+                inputMode="numeric"
+                value={formData.phone_number || ""}
+                placeholder="Phone Number"
                 onChange={(e) =>
                   handleChange("phone_number", Number(e.target.value))
                 }
-                placeholder="Phone Number"
               />
+
               <Input
                 value={formData.role_title || ""}
                 onChange={(e) => handleChange("role_title", e.target.value)}

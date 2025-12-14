@@ -54,7 +54,6 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [user, setUser] = useState<UserProfile | null>(null);
 
@@ -194,31 +193,84 @@ export default function ChatPage() {
     };
 
     fetchMessages();
-
     const channel = supabase
-      .channel("chat-room")
+      .channel(`chat-${fromUserId}-${toUserId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages" },
-        (payload) => {
-          const msg = payload.new as Message;
-          if (
-            (msg.from_user.id === fromUserId && msg.to_user.id === toUserId) ||
-            (msg.from_user.id === toUserId && msg.to_user.id === fromUserId)
-          ) {
-            setMessages((prev) => [...prev, msg]);
-          }
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+        },
+        async (payload) => {
+          const newRow = payload.new;
+
+          // ✅ Only allow messages for current chat
+          const isCurrentChat =
+            (newRow.from_user === fromUserId && newRow.to_user === toUserId) ||
+            (newRow.from_user === toUserId && newRow.to_user === fromUserId);
+
+          if (!isCurrentChat) return;
+
+          // 🔥 Fetch full message with joins
+          const { data, error } = await supabase
+            .from("messages")
+            .select("*, from_user(*), to_user(*)")
+            .eq("id", newRow.id)
+            .single();
+
+          if (error || !data) return;
+
+          // ✅ Prevent duplicate messages
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === data.id)) return prev;
+            return [...prev, data];
+          });
+
+          // ✅ Update sidebar last message
+          setChatUsers((prev) => {
+            const otherUser =
+              data.from_user.id === fromUserId ? data.to_user : data.from_user;
+
+            const exists = prev.find((c) => c.user.id === otherUser.id);
+
+            if (!exists) {
+              return [
+                {
+                  user: otherUser,
+                  lastMessage: data.content,
+                  lastMessageTime: data.created_at,
+                },
+                ...prev,
+              ];
+            }
+
+            return prev.map((c) =>
+              c.user.id === otherUser.id
+                ? {
+                    ...c,
+                    lastMessage: data.content,
+                    lastMessageTime: data.created_at,
+                  }
+                : c
+            );
+          });
         }
       )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      .subscribe((status) => {
+        console.log("📡 Chat realtime status:", status);
+      });
   }, [fromUserId, toUserId]);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    // Use requestAnimationFrame to wait for layout
+    requestAnimationFrame(() => {
+      container.scrollTop = container.scrollHeight;
+    });
   }, [messages]);
 
   const handleSend = async () => {
@@ -315,7 +367,10 @@ export default function ChatPage() {
         {/* Main chat area */}
         <main className="px-6 md:px-12 pt-4 max-w-6xl   w-full">
           <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white max-w-5xl mx-auto p-6 rounded-2xl shadow-2xl flex flex-col h-full">
-            <div className="flex-1 overflow-y-auto space-y-6 pr-2 hide-scrollbar">
+            <div
+              ref={messagesContainerRef}
+              className="flex-1 overflow-y-auto space-y-6 pr-2 hide-scrollbar"
+            >
               {messages.length > 0 ? (
                 <>
                   {messages.map((msg, idx) => (
@@ -381,7 +436,6 @@ export default function ChatPage() {
                       )}
                     </div>
                   ))}
-                  <div ref={messagesEndRef} />
                 </>
               ) : (
                 <div className="text-center text-gray-400 text-lg">
